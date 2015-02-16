@@ -335,12 +335,15 @@ status_t AudioPolicyService::setStreamVolumeIndex(audio_stream_type_t stream,
         return BAD_VALUE;
     }
     Mutex::Autolock _l(mLock);
+#ifndef STE_AUDIO
     if (mpAudioPolicy->set_stream_volume_index_for_device) {
         return mpAudioPolicy->set_stream_volume_index_for_device(mpAudioPolicy,
                                                                 stream,
                                                                 index,
                                                                 device);
-    } else {
+    } else
+#endif
+    {
         return mpAudioPolicy->set_stream_volume_index(mpAudioPolicy, stream, index);
     }
 }
@@ -356,12 +359,15 @@ status_t AudioPolicyService::getStreamVolumeIndex(audio_stream_type_t stream,
         return BAD_VALUE;
     }
     Mutex::Autolock _l(mLock);
+#ifndef STE_AUDIO
     if (mpAudioPolicy->get_stream_volume_index_for_device) {
         return mpAudioPolicy->get_stream_volume_index_for_device(mpAudioPolicy,
                                                                 stream,
                                                                 index,
                                                                 device);
-    } else {
+    } else
+#endif
+    {
         return mpAudioPolicy->get_stream_volume_index(mpAudioPolicy, stream, index);
     }
 }
@@ -433,11 +439,14 @@ bool AudioPolicyService::isStreamActive(audio_stream_type_t stream, uint32_t inP
 
 bool AudioPolicyService::isStreamActiveRemotely(audio_stream_type_t stream, uint32_t inPastMs) const
 {
+#if !defined(ICS_AUDIO_BLOB) && !defined(MR1_AUDIO_BLOB)
     if (mpAudioPolicy == NULL) {
         return 0;
     }
     Mutex::Autolock _l(mLock);
     return mpAudioPolicy->is_stream_active_remotely(mpAudioPolicy, stream, inPastMs);
+#endif
+    return 0;
 }
 
 bool AudioPolicyService::isSourceActive(audio_source_t source) const
